@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Path("/notices/payments")
 public class PaymentRestResources {
@@ -25,6 +26,7 @@ public class PaymentRestResources {
 	@POST
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response createPayment(@PathParam("id") int id, @PathParam("token") String token,
 			String body){
 		JSONObject json = new JSONObject(body);
@@ -41,6 +43,7 @@ public class PaymentRestResources {
 	@GET
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response getPayment(@PathParam("id") int id, @PathParam("token") String token){
 		PaymentBean payment;
 		try{
@@ -60,6 +63,7 @@ public class PaymentRestResources {
 	@PUT
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response updatePayment(@PathParam("id") int id, @PathParam("token") String token, String body){
 		String amount = "";
 		String date = "";

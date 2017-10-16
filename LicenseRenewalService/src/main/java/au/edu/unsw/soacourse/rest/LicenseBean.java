@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -23,6 +24,8 @@ public class LicenseBean {
 	private String email;
 	@Column(name="expirydate")
 	private Date expiryDate;
+	@OneToOne
+	private NoticeBean notice;
 	
 	public String getLicenseNumber() {
 		return licenseNumber;
@@ -60,7 +63,10 @@ public class LicenseBean {
 	public void setExpiryDate(Date expiryDate) {
 		this.expiryDate = expiryDate;
 	}
-	
-	
-
+	public NoticeBean getNotice() {
+		return notice;
+	}
+	public void setNotice(NoticeBean notice) {
+		this.notice = notice;
+	}
 }

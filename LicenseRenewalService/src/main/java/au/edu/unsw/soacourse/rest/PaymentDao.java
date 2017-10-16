@@ -43,6 +43,7 @@ public class PaymentDao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		notice.setPayment(payment);
 		session.persist(payment);
 		t.commit();
 		session.close();

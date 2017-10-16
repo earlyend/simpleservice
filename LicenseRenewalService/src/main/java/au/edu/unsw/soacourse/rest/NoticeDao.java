@@ -44,7 +44,7 @@ public class NoticeDao {
 			notice.setStatus("new");
 			session.persist(notice);
 			session.flush();
-			notice.setLocation("http://localhost:8080/LicenseRenewalService/notices/"+notice.getToken()+"/"+notice.getNoticeId());
+			notice.setLocation("http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/notices/"+notice.getToken()+"/"+notice.getNoticeId());
 			session.merge(notice);
 			notices.add(notice);
 		}
@@ -97,11 +97,15 @@ public class NoticeDao {
 	
 	public static boolean deleteNotice(int id, String token){
 		Session session = HibernateHelper.getSessionFactory().openSession();
+		Transaction t = session.beginTransaction();
 		NoticeBean notice = session.get(NoticeBean.class, id);
 		if(!notice.getToken().equals(token)){
 			return false;
 		}
+		PaymentBean payment = notice.getPayment();
+		session.delete(payment);
 		session.delete(notice);
+		t.commit();
 		session.close();
 		return true;
 	}

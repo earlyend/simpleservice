@@ -6,6 +6,13 @@
     <session-factory>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.username">simpleservice</property>
+        <property name="hibernate.connection.password">simpleservice9322</property>
+        <property name="hibernate.connection.url">jdbc:mysql://simpleservice.cfsca2aleihi.ap-southeast-2.rds.amazonaws.com:3306/simpleservicedb
+        </property>
+        <property name="show_sql">true</property>
+        <property name="hibernate.id.new_generator_mappings">false</property>
+        
         
         <property name="c3p0.min_size">3</property>  
         <property name="c3p0.max_size">5</property>  
@@ -19,5 +26,6 @@
         
         <mapping class="au.edu.unsw.soacourse.rest.NoticeBean"/>
         <mapping class="au.edu.unsw.soacourse.rest.PaymentBean"/>
+        <mapping class="au.edu.unsw.soacourse.rest.LicenseBean"/>
     </session-factory>
 </hibernate-configuration>

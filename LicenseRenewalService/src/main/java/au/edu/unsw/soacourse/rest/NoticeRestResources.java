@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 @Path("/notices")
@@ -30,8 +31,9 @@ public class NoticeRestResources {
 
 	@POST
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response createNotices(@HeaderParam("x-auth-token") String authToken){
-		if(authToken.isEmpty()){
+		if(authToken == null){
 			return Response.status(401).entity("{\"error\":\"You need to be logged in as an officer to use this endpoint.\"}").build();
 		}
 		List<NoticeBean> notices = NoticeDao.createNotices();
@@ -45,6 +47,7 @@ public class NoticeRestResources {
 	@GET
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response getNotice(@PathParam("token") String token, @PathParam("id") int id){
 		NoticeBean notice = NoticeDao.getNotice(token, id);
 		if(!notice.getToken().equals(token)){
@@ -56,8 +59,9 @@ public class NoticeRestResources {
 	
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response getAllNotices(@HeaderParam("x-auth-token") String authToken){
-		if(authToken.isEmpty()){
+		if(authToken == null){
 			return Response.status(401).entity("{\"error\":\"You need to be logged in as an officer to use this endpoint.\"}").build();
 		}
 		List<NoticeBean> notices = NoticeDao.getAllNotices();
@@ -71,13 +75,17 @@ public class NoticeRestResources {
 	@PUT
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
-	@Consumes({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response updateNotice(@PathParam("id") int id, @PathParam("token") String token, String body){
 		//TODO potential rejection reason
 		JSONObject json = new JSONObject(body);
 		String email = "";
 		String address = "";
 		String status = "";
+		String reason = "";
+		if(json.has("reason")){
+			//TODO Handle it
+		}
 		if(json.has("email")){
 			email = json.getString("email");
 		}
@@ -98,6 +106,7 @@ public class NoticeRestResources {
 	@DELETE
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
+	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
 	public Response deleteNotice(@PathParam("id") int id, @PathParam("token") String token){
 		boolean deleted = NoticeDao.deleteNotice(id, token);
 		if(!deleted){

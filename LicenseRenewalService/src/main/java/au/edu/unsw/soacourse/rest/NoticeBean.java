@@ -2,11 +2,13 @@ package au.edu.unsw.soacourse.rest;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -28,6 +30,10 @@ public class NoticeBean implements Serializable {
 	private String location;
 	@Column(name="token")
 	private String token;
+	@Column(name="rejectionreason")
+	private String rejectionReason;
+	@OneToOne(cascade = CascadeType.ALL)
+	private PaymentBean payment;
 	
 	public int getNoticeId() {
 		return noticeId;
@@ -70,5 +76,17 @@ public class NoticeBean implements Serializable {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getRejectionReason() {
+		return rejectionReason;
+	}
+	public void setRejectionReason(String rejectionReason) {
+		this.rejectionReason = rejectionReason;
+	}
+	public PaymentBean getPayment() {
+		return payment;
+	}
+	public void setPayment(PaymentBean payment) {
+		this.payment = payment;
 	}
 }
