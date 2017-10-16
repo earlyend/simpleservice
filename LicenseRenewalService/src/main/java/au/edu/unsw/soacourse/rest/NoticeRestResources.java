@@ -16,10 +16,11 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
+//mport org.springframework.web.bind.annotation.CrossOrigin;
 
 
 @Path("/notices")
@@ -31,7 +32,7 @@ public class NoticeRestResources {
 
 	@POST
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080"})
 	public Response createNotices(@HeaderParam("x-auth-token") String authToken){
 		if(authToken == null){
 			return Response.status(401).entity("{\"error\":\"You need to be logged in as an officer to use this endpoint.\"}").build();
@@ -47,7 +48,7 @@ public class NoticeRestResources {
 	@GET
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080"})
 	public Response getNotice(@PathParam("token") String token, @PathParam("id") int id){
 		NoticeBean notice = NoticeDao.getNotice(token, id);
 		if(!notice.getToken().equals(token)){
@@ -59,7 +60,7 @@ public class NoticeRestResources {
 	
 	@GET
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080"})
 	public Response getAllNotices(@HeaderParam("x-auth-token") String authToken){
 		if(authToken == null){
 			return Response.status(401).entity("{\"error\":\"You need to be logged in as an officer to use this endpoint.\"}").build();
@@ -75,7 +76,7 @@ public class NoticeRestResources {
 	@PUT
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080"})
 	public Response updateNotice(@PathParam("id") int id, @PathParam("token") String token, String body){
 		//TODO potential rejection reason
 		JSONObject json = new JSONObject(body);
@@ -83,9 +84,7 @@ public class NoticeRestResources {
 		String address = "";
 		String status = "";
 		String reason = "";
-		if(json.has("reason")){
-			//TODO Handle it
-		}
+		boolean rejected = false;
 		if(json.has("email")){
 			email = json.getString("email");
 		}
@@ -95,9 +94,16 @@ public class NoticeRestResources {
 		if(json.has("status")){
 			status = json.getString("status");
 		}
-		NoticeBean notice = NoticeDao.updateNotice(id, token, email, address, status);
+		if(json.has("reason")){
+			rejected = true;
+			reason = json.getString("reason");
+		}
+		NoticeBean notice = NoticeDao.updateNotice(id, token, email, address, status, reason);
 		if(!notice.getToken().equals(token)){
 			return Response.status(400).entity("{\"error\":\"No notice found.\"}").build();
+		}
+		if(rejected == true){
+			return Response.ok().entity("{\"reason\":\""+reason+"\"}").build();
 		}
 		GenericEntity entity = new GenericEntity<NoticeBean>(notice){};
 		return Response.ok().entity(entity).build();
@@ -106,7 +112,7 @@ public class NoticeRestResources {
 	@DELETE
 	@Path("/{token}/{id}")
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080/"})
 	public Response deleteNotice(@PathParam("id") int id, @PathParam("token") String token){
 		boolean deleted = NoticeDao.deleteNotice(id, token);
 		if(!deleted){

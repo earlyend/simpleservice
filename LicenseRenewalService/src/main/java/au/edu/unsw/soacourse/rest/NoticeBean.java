@@ -32,8 +32,6 @@ public class NoticeBean implements Serializable {
 	private String token;
 	@Column(name="rejectionreason")
 	private String rejectionReason;
-	@OneToOne(cascade = CascadeType.ALL)
-	private PaymentBean payment;
 	
 	public int getNoticeId() {
 		return noticeId;
@@ -82,11 +80,5 @@ public class NoticeBean implements Serializable {
 	}
 	public void setRejectionReason(String rejectionReason) {
 		this.rejectionReason = rejectionReason;
-	}
-	public PaymentBean getPayment() {
-		return payment;
-	}
-	public void setPayment(PaymentBean payment) {
-		this.payment = payment;
 	}
 }

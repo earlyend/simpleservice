@@ -65,12 +65,13 @@ public class NoticeDao {
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		List<NoticeBean> notices = (List<NoticeBean>) session.createQuery("from NoticeBean").list();
+		System.out.println(notices.size());
 		t.commit();
 		session.close();
 		return notices;
 	}
 	
-	public static NoticeBean updateNotice(int noticeId, String token, String email, String address, String status){
+	public static NoticeBean updateNotice(int noticeId, String token, String email, String address, String status, String rejection){
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		NoticeBean notice = session.get(NoticeBean.class, noticeId);
@@ -88,12 +89,15 @@ public class NoticeDao {
 		if(!status.isEmpty()){
 			notice.setStatus(status);
 		}
-		System.out.println(notice.getAddress());
+		if(!rejection.isEmpty()){
+			notice.setRejectionReason(rejection);
+		}
 		session.merge(notice);
 		t.commit();
 		session.close();
 		return notice;
 	}
+	
 	
 	public static boolean deleteNotice(int id, String token){
 		Session session = HibernateHelper.getSessionFactory().openSession();
@@ -102,8 +106,12 @@ public class NoticeDao {
 		if(!notice.getToken().equals(token)){
 			return false;
 		}
-		PaymentBean payment = notice.getPayment();
-		session.delete(payment);
+		List<PaymentBean> payments = (List<PaymentBean>) session.createQuery("select p from PaymentBean p where p.noticeId = :id")
+				.setParameter("id", id).list();
+		if(payments.size() != 0){
+			PaymentBean payment = payments.get(0);
+			session.delete(payment);
+		}
 		session.delete(notice);
 		t.commit();
 		session.close();

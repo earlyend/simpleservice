@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.json.JSONObject;
-import org.springframework.web.bind.annotation.CrossOrigin;
+//import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 @Path("/licenses")
@@ -25,7 +25,7 @@ public class LicenseRestResources {
 	@PUT
 	@Path("/{token}/{licensenumber}")
 	@Produces({MediaType.APPLICATION_JSON})
-	@CrossOrigin(origins = "http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com/")
+	//@CrossOrigin(origins = {"http://licenserenewalservice-env.2qcm7emnen.ap-southeast-2.elasticbeanstalk.com", "http://localhost:8080"})
 	public Response updateLicense(@PathParam("licensenumber") String licensenumber, @PathParam("token") String token,
 			String body){
 		JSONObject json = new JSONObject(body);
