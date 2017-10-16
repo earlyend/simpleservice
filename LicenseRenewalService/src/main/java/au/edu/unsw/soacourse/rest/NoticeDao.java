@@ -1,7 +1,7 @@
 package au.edu.unsw.soacourse.rest;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.hibernate.Query;
@@ -14,24 +14,48 @@ public class NoticeDao {
 		
 	}
 	
-	public static NoticeBean createNotice(String licenseNumber, String address, String email){
+	@SuppressWarnings("unchecked")
+	public static List<NoticeBean> createNotices(){
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
-		NoticeBean notice = new NoticeBean();
-		notice.setLicenseNumber(licenseNumber);
-		notice.setAddress(address);
-		notice.setEmail(email);
-		notice.setStatus("new");
-		notice.setLocation("http://localhost:8080/LicenseRenewalService/notices/"+createUniqueToken());
-		session.persist(notice);
+		Query licenseQuery = session.createSQLQuery("SELECT licensenumber, address, email FROM licenses WHERE expirydate < DATE_ADD(NOW(), INTERVAL +2 MONTH)");
+		List<String> existingNotices = (List<String>) session.createQuery("select l.licenseNumber from NoticeBean l").list();
+		List<Object[]> licenses = licenseQuery.list();
+		List<NoticeBean> notices = new ArrayList<NoticeBean>();
+		System.out.println(existingNotices.size());
+		for(Object[] license : licenses){
+			boolean existing = false;
+			for(String existingNotice : existingNotices){
+				if(license[0].toString().equals(existingNotice)){
+					existing = true;
+					break;
+				}
+			}
+			if(existing){
+				continue;
+			}
+			NoticeBean notice = new NoticeBean();
+			notice.setLicenseNumber(license[0].toString());
+			notice.setAddress(license[1].toString());
+			notice.setEmail(license[2].toString());
+			String token = createUniqueToken();
+			notice.setToken(token);
+			notice.setLocation("new");
+			notice.setStatus("new");
+			session.persist(notice);
+			session.flush();
+			notice.setLocation("http://localhost:8080/LicenseRenewalService/notices/"+notice.getToken()+"/"+notice.getNoticeId());
+			session.merge(notice);
+			notices.add(notice);
+		}
 		t.commit();
 		session.close();
-		return notice;
+		return notices;
 	}
 	
-	public NoticeBean getNotice(String noticeId){
+	public static NoticeBean getNotice(String token, int id){
 		Session session = HibernateHelper.getSessionFactory().openSession();
-		NoticeBean notice = session.get(NoticeBean.class, noticeId);
+		NoticeBean notice = session.get(NoticeBean.class, id);
 		session.close();
 		return notice;
 	}
@@ -46,23 +70,40 @@ public class NoticeDao {
 		return notices;
 	}
 	
-	public NoticeBean updateNotice(String noticeId, Map<String, String> fields){
+	public static NoticeBean updateNotice(int noticeId, String token, String email, String address, String status){
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
 		NoticeBean notice = session.get(NoticeBean.class, noticeId);
-		if(fields.containsKey("email")){
-			notice.setEmail(fields.get("email"));
+		if(!notice.getToken().equals(token)){
+			System.out.println("wrong");
+			session.close();
+			return notice;
 		}
-		if(fields.containsKey("status")){
-			notice.setEmail(fields.get("status"));
+		if(!email.isEmpty()){
+			notice.setEmail(email);
 		}
-		if(fields.containsKey("address")){
-			notice.setEmail(fields.get("address"));
+		if(!address.isEmpty()){
+			notice.setAddress(address);
 		}
+		if(!status.isEmpty()){
+			notice.setStatus(status);
+		}
+		System.out.println(notice.getAddress());
 		session.merge(notice);
 		t.commit();
 		session.close();
 		return notice;
+	}
+	
+	public static boolean deleteNotice(int id, String token){
+		Session session = HibernateHelper.getSessionFactory().openSession();
+		NoticeBean notice = session.get(NoticeBean.class, id);
+		if(!notice.getToken().equals(token)){
+			return false;
+		}
+		session.delete(notice);
+		session.close();
+		return true;
 	}
 	
 	private static String generateToken() {
@@ -83,7 +124,7 @@ public class NoticeDao {
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction tt = session.beginTransaction();
 		String token = generateToken();
-		Query urlQuery = session.createQuery("select notice from NoticeBean notice where notice.url = :token").setParameter("token", token);
+		Query urlQuery = session.createQuery("select notice from NoticeBean notice where notice.token = :token").setParameter("token", token);
 		List<NoticeBean> notices = (List<NoticeBean>) urlQuery.list();
 		while(!notices.isEmpty()) {
 			token = generateToken();

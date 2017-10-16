@@ -9,7 +9,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class PaymentDao {
-	
+
+	public PaymentDao(){
+
+	}
+
 	public static PaymentBean createPayment(int id, String token, String amount, String date){
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		Transaction t = session.beginTransaction();
@@ -44,11 +48,37 @@ public class PaymentDao {
 		session.close();
 		return payment;
 	}
-	
+
 	public static PaymentBean getPayment(int id, String token){
 		Session session = HibernateHelper.getSessionFactory().openSession();
 		PaymentBean payment = (PaymentBean) session.createQuery("select p from PaymentBean p, NoticeBean n where p.noticeId=:id and n.token=:token")
 				.setParameter("id", id).setParameter("token", token).uniqueResult();
+		session.close();
+		return payment;
+	}
+
+	public static PaymentBean updatePayment(int id, String token, String amount, String date){
+		Session session = HibernateHelper.getSessionFactory().openSession();
+		PaymentBean payment = (PaymentBean) session.createQuery("select p from PaymentBean p, NoticeBean n where p.noticeId=:id and n.token=:token")
+				.setParameter("id", id).setParameter("token", token).uniqueResult();
+		if(!amount.isEmpty()){
+			payment.setAmount(amount);
+		}
+		if(!date.isEmpty()){
+			SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+			java.util.Date tempDate;
+			try {
+				tempDate = format.parse(date);
+				payment.setPaidDate(new Date(tempDate.getTime()));
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		Transaction t = session.beginTransaction();
+		session.merge(payment);
+		t.commit();
+		session.close();
 		return payment;
 	}
 }

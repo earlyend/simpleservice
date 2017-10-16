@@ -1,19 +1,22 @@
 package au.edu.unsw.soacourse.rest;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="notices")
-public class NoticeBean {
+public class NoticeBean implements Serializable {
 
 	@Id
-	@GeneratedValue
-	private String noticeId;
-	@Column(name="licid")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int noticeId;
+	@Column(name="licensenumber", unique = true)
 	private String licenseNumber;
 	@Column(name="address")
 	private String address;
@@ -26,10 +29,10 @@ public class NoticeBean {
 	@Column(name="token")
 	private String token;
 	
-	public String getNoticeId() {
+	public int getNoticeId() {
 		return noticeId;
 	}
-	public void setNoticeId(String noticeId) {
+	public void setNoticeId(int noticeId) {
 		this.noticeId = noticeId;
 	}
 	public String getAddress() {

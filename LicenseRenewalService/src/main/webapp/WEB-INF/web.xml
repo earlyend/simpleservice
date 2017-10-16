@@ -6,12 +6,11 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/beans.xml</param-value>
     </context-param>
+    
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-    <listener>  
-    	<listener-class>au.edu.unsw.soacourse.rest.HibernateListener</listener-class>  
-	</listener>  
+
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
